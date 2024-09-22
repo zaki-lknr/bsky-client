@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>bsky sample</title>
+        <script src="sample.js" type="module"></script>
+    </head>
+
+    <body>
+        <h1 id="title">bsky sample page</h1>
+        <hr/>
+        <label for="bsky_id">Bluesky username</label>
+        <input type="text" id="bsky_id" name="bsky_id" placeholder="username.bsky.social"/>
+        <br/>
+        <label for="bsky_id">Bluesky password</label>
+        <input type="password" id="bsky_pass" name="bsky_pass" placeholder="password"/>
+        <br/>
+        <button id="btn_save">save</button>
+        <button id="btn_load">load</button>
+        <hr/>
+        <input type="text" id="post_string"/>
+        <input type="file" id="file" multiple/>
+        <button id="btn_post">post</button>
+        <ul id="list"></ul>
+    </body>
+</html>
