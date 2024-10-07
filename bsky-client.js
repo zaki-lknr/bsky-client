@@ -41,6 +41,13 @@ export class JpzBskyClient {
     }
 
     /**
+     * @returns 最後に実行したHTTPアクセスのステータスコード
+     */
+    getLastErrCode() {
+        return this.last_status;
+    }
+
+    /**
      * 添付画像設定
      * @param {string} 添付画像のURL
      */
