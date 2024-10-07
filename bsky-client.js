@@ -7,6 +7,9 @@ export class JpzBskyClient {
     bsky_id;
     bsky_pass;
 
+    // last status
+    last_status;
+
     message;
     // attach;
     image_files;
@@ -34,7 +37,14 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.1.0";
+        return "0.2.0";
+    }
+
+    /**
+     * @returns 最後に実行したHTTPアクセスのステータスコード
+     */
+    getLastErrCode() {
+        return this.last_status;
     }
 
     /**
@@ -98,6 +108,7 @@ export class JpzBskyClient {
         });
     
         const res = await fetch(url, { method: "POST", body: body, headers: headers });
+        this.last_status = res.status;
         if (!res.ok) {
             throw new Error('com.atproto.server.createSession failed: ' + await res.text());
         }
@@ -220,6 +231,7 @@ export class JpzBskyClient {
     
     
         const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
+        this.last_status = res.status;
         console.log('posting... ' + res.status);
         if (!res.ok) {
             throw new Error(url + ': ' + await res.text());
@@ -244,6 +256,7 @@ export class JpzBskyClient {
                     const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?' + encodeURIComponent(image_url): image_url;
                     try {
                         const res_img = await fetch(url);
+                        this.last_status = res.status;
                         if (!res_img.ok) {
                             throw new Error(url + ': ' + await res_img.text());
                         }
@@ -265,6 +278,7 @@ export class JpzBskyClient {
             headers.append('Content-Type', item.type);
             
             const res = await fetch(url, { method: "POST", body: item.blob, headers: headers });
+            this.last_status = res.status;
             if (!res.ok) {
                 throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
             }
@@ -280,6 +294,7 @@ export class JpzBskyClient {
         const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?' + encodeURIComponent(url): url;
         try {
             const res = await fetch(ogp_url);
+            this.last_status = res.status;
             if (!res.ok) {
                 throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
             }

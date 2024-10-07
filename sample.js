@@ -45,5 +45,12 @@ const post = async () => {
     if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
     }
-    bsky.post(message);
+    try {
+        await bsky.post(message);
+    }
+    catch(e) {
+        console.log(e);
+    }
+    const code = bsky.getLastErrCode();
+    console.log(code);
 }
