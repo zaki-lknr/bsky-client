@@ -13,6 +13,7 @@ This is a JavaScript library to posting to Bluesky without SDK.
 - ✅ auto linkcard
 - ✅ auto shorten linktext
 - ✅ auto twitter-account link
+- ☐ compress image size
 - ☐ attach movie
 - ☐ mentions
 - ☐ replies
@@ -21,4 +22,4 @@ This is a JavaScript library to posting to Bluesky without SDK.
 
 # how to use
 
-see [sample.html](https://github.com/zaki-lknr/bsky-client/blob/main/sample.html)
+see: [sample.js](https://github.com/zaki-lknr/bsky-client/blob/main/sample.js) and [sample.html](https://github.com/zaki-lknr/bsky-client/blob/main/sample.html)
