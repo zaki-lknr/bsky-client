@@ -1,5 +1,24 @@
 # bsky-client
 
-JavaScriptで動作するBluesky投稿ライブラリ
+JavaScriptで動作するBluesky投稿ライブラリ  
+This is a JavaScript library to posting to Bluesky without SDK.
 
 [Posts | Bluesky](https://docs.bsky.app/docs/advanced-guides/posts)
+
+# implemented
+
+- ✅ attach images
+- ✅ auto hashtag
+- ✅ auto link
+- ✅ auto linkcard
+- ✅ auto shorten linktext
+- ✅ auto twitter-account link
+- ☐ attach movie
+- ☐ mentions
+- ☐ replies
+- ☐ quote posts
+- ☐ read timeline
+
+# how to use
+
+see [sample.html](https://github.com/zaki-lknr/bsky-client/blob/main/sample.html)
