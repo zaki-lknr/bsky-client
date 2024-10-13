@@ -359,6 +359,23 @@ export class JpzBskyClient {
         return results;
     }
 
+    /**
+     * メンション処理
+     * @param {string} 投稿テキスト本文
+     * @returns
+     */
+    #get_mentions_facets(message) {
+        const result = [];
+        // ドメイン名を拾う
+        regex = RegExp(/\@([\w\d][\w\d\-]*[\w\d]*\.)+[\w]{2,}/, 'g');
+        let e;
+        while (e = regex.exec(message)) {
+            const account = message.substring(e.index, e.index + e[0].length);
+            result.push(account);
+        }
+        return result;
+    }
+
     #get_tw_accounts_facets(message) {
         const result = [];
         const regex = RegExp(/\@[_a-zA-Z0-9]+(?=($|\s|,|\. ))/, 'g');
