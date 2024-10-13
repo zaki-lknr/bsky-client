@@ -364,15 +364,32 @@ export class JpzBskyClient {
      * @param {string} 投稿テキスト本文
      * @returns
      */
-    #get_mentions_facets(message) {
+    async #get_mentions_facets(message) {
         const result = [];
         // ドメイン名を拾う
-        regex = RegExp(/\@([\w\d][\w\d\-]*[\w\d]*\.)+[\w]{2,}/, 'g');
+        const regex = RegExp(/\@([\w\d][\w\d\-]*[\w\d]*\.)+[\w]{2,}/, 'g');
         let e;
         while (e = regex.exec(message)) {
             const account = message.substring(e.index, e.index + e[0].length);
-            result.push(account);
-        }
+            // result.push(account);
+            const url = "https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
+            const resp = await fetch(url);
+            const json = await resp.json();
+            // バイトサイズの位置に変換
+            const start_pos_b = new Blob([message.substring(0, e.index)]).size;
+            const end_pos_b = new Blob([message.substring(e.index, e.index + e[0].length)]).size;
+            // result.push(account);
+            result.push({
+                index: {
+                    byteStart: start_pos_b,
+                    byteEnd: end_pos_b,
+                },
+                features: [{
+                    $type: 'app.bsky.richtext.facet#mention',
+                    did: json.did
+                }]
+            });
+            }
         return result;
     }
 
