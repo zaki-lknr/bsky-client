@@ -37,7 +37,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.2.0";
+        return "0.3.0";
     }
 
     /**
@@ -211,7 +211,11 @@ export class JpzBskyClient {
         const f = this.#get_tw_accounts_facets(this.message);
         // console.log(f);
         body.record.facets.push(...f);
-    
+
+        const mentions = await this.#get_mentions_facets(this.message);
+        console.log(mentions);
+        body.record.facets.push(...mentions);
+
         const tags = this.#search_tag_pos(update_msg);
         if (tags != null) {
             for (const tag of tags) {
@@ -357,6 +361,48 @@ export class JpzBskyClient {
             results.push(...next);
         }
         return results;
+    }
+
+    /**
+     * メンション処理
+     * @param {string} 投稿テキスト本文
+     * @returns
+     */
+    async #get_mentions_facets(message) {
+        const result = [];
+        // ドメイン名を拾う
+        const regex = RegExp(/\@([\w\d][\w\d\-]*[\w\d]*\.)+[\w]{2,}/, 'g');
+        let e;
+        while (e = regex.exec(message)) {
+            const account = message.substring(e.index, e.index + e[0].length);
+            // result.push(account);
+            const url = "https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
+            const resp = await fetch(url);
+            this.last_status = resp.status;
+            if (resp.status === 400) {
+                // unknown user (ignore)
+                continue;
+            }
+            else if (!resp.ok) {
+                throw new Error(url + ': ' + await resp.text());
+            }
+            const json = await resp.json();
+            // バイトサイズの位置に変換
+            const start_pos_b = new Blob([message.substring(0, e.index)]).size;
+            const end_pos_b = new Blob([message.substring(0, e.index + e[0].length)]).size;
+            // result.push(account);
+            result.push({
+                index: {
+                    byteStart: start_pos_b,
+                    byteEnd: end_pos_b,
+                },
+                features: [{
+                    $type: 'app.bsky.richtext.facet#mention',
+                    did: json.did
+                }]
+            });
+            }
+        return result;
     }
 
     #get_tw_accounts_facets(message) {
