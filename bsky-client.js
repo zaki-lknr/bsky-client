@@ -211,7 +211,11 @@ export class JpzBskyClient {
         const f = this.#get_tw_accounts_facets(this.message);
         // console.log(f);
         body.record.facets.push(...f);
-    
+
+        const mentions = await this.#get_mentions_facets(this.message);
+        console.log(mentions);
+        body.record.facets.push(...mentions);
+
         const tags = this.#search_tag_pos(update_msg);
         if (tags != null) {
             for (const tag of tags) {
@@ -377,7 +381,7 @@ export class JpzBskyClient {
             const json = await resp.json();
             // バイトサイズの位置に変換
             const start_pos_b = new Blob([message.substring(0, e.index)]).size;
-            const end_pos_b = new Blob([message.substring(e.index, e.index + e[0].length)]).size;
+            const end_pos_b = new Blob([message.substring(0, e.index + e[0].length)]).size;
             // result.push(account);
             result.push({
                 index: {
