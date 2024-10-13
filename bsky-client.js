@@ -37,7 +37,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.2.0";
+        return "0.3.0";
     }
 
     /**
@@ -378,6 +378,14 @@ export class JpzBskyClient {
             // result.push(account);
             const url = "https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
             const resp = await fetch(url);
+            this.last_status = resp.status;
+            if (resp.status === 400) {
+                // unknown user (ignore)
+                continue;
+            }
+            else if (!resp.ok) {
+                throw new Error(url + ': ' + await resp.text());
+            }
             const json = await resp.json();
             // バイトサイズの位置に変換
             const start_pos_b = new Blob([message.substring(0, e.index)]).size;
