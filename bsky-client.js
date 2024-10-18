@@ -52,7 +52,9 @@ export class JpzBskyClient {
      * @param {string} 添付画像のURL
      */
     setImageUrl(image_url) {
-        this.image_urls.push(image_url);
+        if (this.image_url.length < 4) {
+            this.image_urls.push(image_url);
+        }
         this.image_files = null;
     }
     /**
