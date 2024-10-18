@@ -60,6 +60,7 @@ export class JpzBskyClient {
      * @param {blob} 添付画像Blob
      */
     setImageFiles(image_files) {
+        // this.image_files = image_files.slice(0,4);  // 配列じゃないので不可
         this.image_files = image_files;
         this.image_urls.splice(0);
     }
@@ -247,13 +248,18 @@ export class JpzBskyClient {
     async #post_image(session) {
         const inputs = [];
         const resp_blob = [];
+        let count = 0;
     
         if (this.image_files != null) {
+            // console.log("image files");
+            // console.log(typeof(this.image_files));
             for (const image_file of this.image_files) {
+                if (++count > 4) { console.log("ignore more than 4 elements"); break; } // 4ファイル以上は無視
                 inputs.push({blob: image_file, type: image_file.type});
             }
         }
         else {
+            console.log("else");
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
