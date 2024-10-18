@@ -265,7 +265,6 @@ export class JpzBskyClient {
             }
         }
         else {
-            console.log("else");
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
