@@ -11,7 +11,11 @@ export class JpzBskyClient {
     last_status;
 
     message;
+
     // attach;
+    // 型が違うため4枚目制限の処理タイミングが異なる
+    // url: set時
+    // file: 送信時
     image_files;
     image_urls = [];
 
