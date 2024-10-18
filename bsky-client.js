@@ -41,7 +41,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.3.1";
+        return "0.3.2";
     }
 
     /**
@@ -56,7 +56,7 @@ export class JpzBskyClient {
      * @param {string} 添付画像のURL
      */
     setImageUrl(image_url) {
-        if (this.image_url.length < 4) {
+        if (this.image_urls.length < 4) {
             this.image_urls.push(image_url);
         }
         this.image_files = null;
