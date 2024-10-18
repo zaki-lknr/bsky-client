@@ -11,7 +11,11 @@ export class JpzBskyClient {
     last_status;
 
     message;
+
     // attach;
+    // 型が違うため4枚目制限の処理タイミングが異なる
+    // url: set時
+    // file: 送信時
     image_files;
     image_urls = [];
 
@@ -37,7 +41,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.3.0";
+        return "0.3.1";
     }
 
     /**
@@ -52,7 +56,9 @@ export class JpzBskyClient {
      * @param {string} 添付画像のURL
      */
     setImageUrl(image_url) {
-        this.image_urls.push(image_url);
+        if (this.image_url.length < 4) {
+            this.image_urls.push(image_url);
+        }
         this.image_files = null;
     }
     /**
@@ -60,6 +66,7 @@ export class JpzBskyClient {
      * @param {blob} 添付画像Blob
      */
     setImageFiles(image_files) {
+        // this.image_files = image_files.slice(0,4);  // 配列じゃないので不可
         this.image_files = image_files;
         this.image_urls.splice(0);
     }
@@ -247,9 +254,13 @@ export class JpzBskyClient {
     async #post_image(session) {
         const inputs = [];
         const resp_blob = [];
+        let count = 0;
     
         if (this.image_files != null) {
+            // console.log("image files");
+            // console.log(typeof(this.image_files));
             for (const image_file of this.image_files) {
+                if (++count > 4) { console.log("ignore more than 4 elements"); break; } // 4ファイル以上は無視
                 inputs.push({blob: image_file, type: image_file.type});
             }
         }
