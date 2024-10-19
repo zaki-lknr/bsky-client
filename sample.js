@@ -40,10 +40,18 @@ const post = async () => {
     const configure = load_configure();
     const message = document.getElementById("post_string").value;
     const local_images = document.getElementById("file").files;
+    const image_urls = document.getElementById("image_urls").value;
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
     if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
+    }
+    else if (image_urls.length > 0) {
+        for (const item of image_urls.split(",")) {
+            console.log(item);
+            bsky.setImageUrl(item);
+        }
+        bsky.enableCorsProxyAtGetImage(true);
     }
     try {
         await bsky.post(message);
