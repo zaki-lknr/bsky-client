@@ -41,7 +41,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.3.2";
+        return "0.3.3";
     }
 
     /**
@@ -271,7 +271,7 @@ export class JpzBskyClient {
                     const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?' + encodeURIComponent(image_url): image_url;
                     try {
                         const res_img = await fetch(url);
-                        this.last_status = res.status;
+                        this.last_status = res_img.status;
                         if (!res_img.ok) {
                             throw new Error(url + ': ' + await res_img.text());
                         }
