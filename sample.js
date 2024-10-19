@@ -47,7 +47,10 @@ const post = async () => {
         bsky.setImageFiles(local_images);
     }
     else if (image_urls.length > 0) {
-        bsky.setImageUrl(image_urls);
+        for (const item of image_urls.split(",")) {
+            console.log(item);
+            bsky.setImageUrl(item);
+        }
         bsky.enableCorsProxyAtGetImage(true);
     }
     try {
