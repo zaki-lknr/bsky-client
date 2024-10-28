@@ -101,6 +101,13 @@ export class JpzBskyClient {
         // }
 
         const session = await this.#createSession();
+
+        // const last_session = {
+        //     accessJwt: "",
+        //     refreshJwt: ""
+        // }
+        // const session = await this.#refreshSession(last_session);
+
         await this.#post_message(session);
     }
 
@@ -121,6 +128,21 @@ export class JpzBskyClient {
         }
     
         const response = await res.json();
+        return response;
+    }
+
+    async #refreshSession(session) {
+        const url = "https://bsky.social/xrpc/com.atproto.server.refreshSession";
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', "Bearer " + session.refreshJwt);
+        const res = await fetch(url, { method: "POST", headers: headers });
+        this.last_status = res.status;
+        if (!res.ok) {
+            throw new Error(url + ' failed: ' + await res.text());
+        }
+        const response = await res.json();
+        console.log(response);
         return response;
     }
 
