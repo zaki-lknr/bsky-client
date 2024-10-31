@@ -18,10 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
 const save_configure = () => {
     const bsky_id = document.getElementById("bsky_id").value;
     const bsky_pass = document.getElementById("bsky_pass").value;
+    const refresh_jwt = document.getElementById("refresh_jwt").value;
 
     const configuration = {
         bsky_id: bsky_id,
-        bsky_pass: bsky_pass
+        bsky_pass: bsky_pass,
+        refresh_jwt: refresh_jwt
     }
     localStorage.setItem('bsky_configuration', JSON.stringify(configuration));
 }
@@ -61,4 +63,8 @@ const post = async () => {
     }
     const code = bsky.getLastErrCode();
     console.log(code);
+
+    const refresh_jwt = bsky.getRereshJwt();
+    document.getElementById("refresh_jwt").value = refresh_jwt;
+    save_configure();
 }

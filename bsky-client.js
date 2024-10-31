@@ -41,6 +41,22 @@ export class JpzBskyClient {
 
     /**
      * 
+     * @returns リフレッシュトークン
+     */
+    getRereshJwt() {
+        return this.refresh_jwt;
+    }
+
+    /**
+     * 
+     * @param {string} リフレッシュトークン
+     */
+    setRefreshJwt(refresh_jwt) {
+        this.refresh_jwt = refresh_jwt;
+    }
+
+    /**
+     * 
      * @returns バージョン番号
      */
     static getVersion() {
