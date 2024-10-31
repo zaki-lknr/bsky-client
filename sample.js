@@ -33,6 +33,7 @@ const load_configure = () => {
 
     document.getElementById("bsky_id").value = configure.bsky_id;
     document.getElementById("bsky_pass").value = configure.bsky_pass;
+    document.getElementById("refresh_jwt").value = configure.refresh_jwt;
 
     return configure;
 }
@@ -45,6 +46,7 @@ const post = async () => {
     const image_urls = document.getElementById("image_urls").value;
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
+    bsky.setRefreshJwt(configure.refresh_jwt);
     if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
     }
