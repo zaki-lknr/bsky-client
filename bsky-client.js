@@ -178,6 +178,22 @@ export class JpzBskyClient {
         return response;
     }
 
+    async deleteSession() {
+        if (this.refresh_jwt) {
+            console.log("delete session start");
+            const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
+            const headers = new Headers();
+            headers.append('Authorization', "Bearer " + this.refresh_jwt);
+            const res = await fetch(url, { method: "POST", headers: headers });
+            this.last_status = res.status;
+            console.log(this.last_status);
+            if (!res.ok) {
+                throw new Error(url + ' failed: ' + await res.text());
+            }
+            this.refresh_jwt = null;
+        }
+    }
+
     async #post_message(session) {
         // リンクを含むか確認
         const url_objs = this.#search_url_pos(this.message);

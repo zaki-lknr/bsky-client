@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('btn_post').addEventListener('click', ()=> {
         post();
     });
+    document.getElementById('del_session').addEventListener('click', ()=> {
+        del_session();
+    });
 
 });
 
@@ -69,4 +72,15 @@ const post = async () => {
     const refresh_jwt = bsky.getRereshJwt();
     document.getElementById("refresh_jwt").value = refresh_jwt;
     save_configure();
+}
+
+const del_session = async () => {
+    const configure = load_configure();
+    const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
+    bsky.setRefreshJwt(configure.refresh_jwt);
+
+    bsky.deleteSession();
+    document.getElementById("refresh_jwt").value = "";
+    save_configure();
+    return;
 }
