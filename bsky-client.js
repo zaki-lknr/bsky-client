@@ -24,6 +24,9 @@ export class JpzBskyClient {
     use_corsproxy_getimage = false;
     use_corsproxy_getogp = false;
 
+    // リフレッシュトークン
+    refresh_jwt;
+
     /**
      * 
      * @param {string} Bluesky_ID
@@ -100,7 +103,7 @@ export class JpzBskyClient {
         //     this.attach = attach;
         // }
 
-        const session = await this.#createSession();
+        const session = await this.#getSession();
 
         // const last_session = {
         //     accessJwt: "",
@@ -109,6 +112,17 @@ export class JpzBskyClient {
         // const session = await this.#refreshSession(last_session);
 
         await this.#post_message(session);
+    }
+
+    async #getSession() {
+        if (this.refresh_jwt) {
+            // available refreshtoken
+            console.log("refresh_jwt exist");
+            return await this.#refreshSession(this.refresh_jwt);
+        }
+
+        console.log("create session");
+        return await this.#createSession();
     }
 
     async #createSession() {
@@ -128,14 +142,16 @@ export class JpzBskyClient {
         }
     
         const response = await res.json();
+        this.refresh_jwt = response.refreshJwt;
+        console.log(this.refresh_jwt);
         return response;
     }
 
-    async #refreshSession(session) {
+    async #refreshSession(refresh_jwt) {
         const url = "https://bsky.social/xrpc/com.atproto.server.refreshSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        headers.append('Authorization', "Bearer " + session.refreshJwt);
+        headers.append('Authorization', "Bearer " + refresh_jwt);
         const res = await fetch(url, { method: "POST", headers: headers });
         this.last_status = res.status;
         if (!res.ok) {
