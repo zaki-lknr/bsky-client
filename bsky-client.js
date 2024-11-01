@@ -303,7 +303,7 @@ export class JpzBskyClient {
         body.record.facets.push(...f);
 
         const mentions = await this.#get_mentions_facets(this.message);
-        console.log(mentions);
+        // console.log(mentions);
         body.record.facets.push(...mentions);
 
         const tags = this.#search_tag_pos(update_msg);
