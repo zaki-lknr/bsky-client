@@ -133,8 +133,13 @@ export class JpzBskyClient {
     async #getSession() {
         if (this.refresh_jwt) {
             // available refreshtoken
-            console.log("refresh_jwt exist");
-            return await this.#refreshSession(this.refresh_jwt);
+            // console.log("refresh_jwt exist");
+            const session = await this.#refreshSession(this.refresh_jwt);
+            if (session) {
+                // console.log("refresh session success");
+                return session;
+            }
+            // リフレッシュトークンでセッション作れなかったらcreateSessionする
         }
 
         console.log("create session");
@@ -159,7 +164,7 @@ export class JpzBskyClient {
     
         const response = await res.json();
         this.refresh_jwt = response.refreshJwt;
-        console.log(this.refresh_jwt);
+        // console.log(this.refresh_jwt);
         return response;
     }
 
@@ -170,12 +175,20 @@ export class JpzBskyClient {
         headers.append('Authorization', "Bearer " + refresh_jwt);
         const res = await fetch(url, { method: "POST", headers: headers });
         this.last_status = res.status;
-        if (!res.ok) {
-            throw new Error(url + ' failed: ' + await res.text());
+        console.log(this.last_status);
+        switch (this.last_status) {
+            case 200:
+                const response = await res.json();
+                // console.log(response);
+                return response;
+            case 400:
+            case 401:
+                // expiredは400になる。既定のエラー時は全部createさせる
+                // https://docs.bsky.app/docs/api/com-atproto-server-refresh-session
+                return null;
+            default:
+                throw new Error(url + ' failed: ' + await res.text());
         }
-        const response = await res.json();
-        console.log(response);
-        return response;
     }
 
     async deleteSession() {
