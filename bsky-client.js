@@ -27,6 +27,9 @@ export class JpzBskyClient {
     // リフレッシュトークン
     refresh_jwt;
 
+    // 進捗のコールバック
+    progress_callback;
+
     /**
      * 
      * @param {string} Bluesky_ID
@@ -53,6 +56,13 @@ export class JpzBskyClient {
      */
     setRefreshJwt(refresh_jwt) {
         this.refresh_jwt = refresh_jwt;
+    }
+
+    /**
+     * @param {*} コールバック関数
+     */
+    setProgressCallback(progress_callback) {
+        this.progress_callback = progress_callback;
     }
 
     /**
@@ -147,6 +157,8 @@ export class JpzBskyClient {
     }
 
     async #createSession() {
+        if (this.progress_callback) this.progress_callback("createSession");
+
         const url = "https://bsky.social/xrpc/com.atproto.server.createSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -164,11 +176,13 @@ export class JpzBskyClient {
     
         const response = await res.json();
         this.refresh_jwt = response.refreshJwt;
+        if (this.progress_callback) this.progress_callback(null);
         // console.log(this.refresh_jwt);
         return response;
     }
 
     async #refreshSession(refresh_jwt) {
+        if (this.progress_callback) this.progress_callback("refreshSession");
         const url = "https://bsky.social/xrpc/com.atproto.server.refreshSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -180,11 +194,13 @@ export class JpzBskyClient {
             case 200:
                 const response = await res.json();
                 // console.log(response);
+                if (this.progress_callback) this.progress_callback(null);
                 return response;
             case 400:
             case 401:
                 // expiredは400になる。既定のエラー時は全部createさせる
                 // https://docs.bsky.app/docs/api/com-atproto-server-refresh-session
+                if (this.progress_callback) this.progress_callback(null);
                 return null;
             default:
                 throw new Error(url + ' failed: ' + await res.text());
@@ -193,6 +209,7 @@ export class JpzBskyClient {
 
     async deleteSession() {
         if (this.refresh_jwt) {
+            if (this.progress_callback) this.progress_callback("refreshSession");
             console.log("delete session start");
             const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
             const headers = new Headers();
@@ -204,6 +221,7 @@ export class JpzBskyClient {
                 throw new Error(url + ' failed: ' + await res.text());
             }
             this.refresh_jwt = null;
+            if (this.progress_callback) this.progress_callback(null);
         }
     }
 

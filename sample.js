@@ -41,6 +41,11 @@ const load_configure = () => {
     return configure;
 }
 
+const progress_callback = (message) => {
+    console.log("progress_callback called");
+    console.log(message);
+}
+
 const post = async () => {
     // console.log("start")
     const configure = load_configure();
@@ -50,6 +55,8 @@ const post = async () => {
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
     bsky.setRefreshJwt(configure.refresh_jwt);
+    bsky.setProgressCallback(progress_callback);
+
     if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
     }
