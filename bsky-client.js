@@ -65,6 +65,10 @@ export class JpzBskyClient {
         this.progress_callback = progress_callback;
     }
 
+    #notifyProgress(message) {
+        if (this.progress_callback) this.progress_callback(message);
+    }
+
     /**
      * 
      * @returns バージョン番号
@@ -157,7 +161,7 @@ export class JpzBskyClient {
     }
 
     async #createSession() {
-        if (this.progress_callback) this.progress_callback("createSession");
+        this.#notifyProgress("createSession");
 
         const url = "https://bsky.social/xrpc/com.atproto.server.createSession";
         const headers = new Headers();
@@ -176,13 +180,13 @@ export class JpzBskyClient {
     
         const response = await res.json();
         this.refresh_jwt = response.refreshJwt;
-        if (this.progress_callback) this.progress_callback(null);
+        this.#notifyProgress(null);
         // console.log(this.refresh_jwt);
         return response;
     }
 
     async #refreshSession(refresh_jwt) {
-        if (this.progress_callback) this.progress_callback("refreshSession");
+        this.#notifyProgress("refreshSession");
         const url = "https://bsky.social/xrpc/com.atproto.server.refreshSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -194,13 +198,13 @@ export class JpzBskyClient {
             case 200:
                 const response = await res.json();
                 // console.log(response);
-                if (this.progress_callback) this.progress_callback(null);
+                this.#notifyProgress(null);  //TODO
                 return response;
             case 400:
             case 401:
                 // expiredは400になる。既定のエラー時は全部createさせる
                 // https://docs.bsky.app/docs/api/com-atproto-server-refresh-session
-                if (this.progress_callback) this.progress_callback(null);
+                this.#notifyProgress(null);
                 return null;
             default:
                 throw new Error(url + ' failed: ' + await res.text());
@@ -209,7 +213,7 @@ export class JpzBskyClient {
 
     async deleteSession() {
         if (this.refresh_jwt) {
-            if (this.progress_callback) this.progress_callback("refreshSession");
+            this.#notifyProgress("deleteSession");  //TODO
             console.log("delete session start");
             const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
             const headers = new Headers();
@@ -221,7 +225,7 @@ export class JpzBskyClient {
                 throw new Error(url + ' failed: ' + await res.text());
             }
             this.refresh_jwt = null;
-            if (this.progress_callback) this.progress_callback(null);
+            this.#notifyProgress(null);  //TODO
         }
     }
 
@@ -341,13 +345,14 @@ export class JpzBskyClient {
             }
         }
     
-    
+        this.#notifyProgress("createRecord");
         const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
         this.last_status = res.status;
         console.log('posting... ' + res.status);
         if (!res.ok) {
             throw new Error(url + ': ' + await res.text());
         }
+        this.#notifyProgress(null);
         // const response = await res.text();
         // console.log(response);
     }
@@ -366,6 +371,7 @@ export class JpzBskyClient {
             }
         }
         else {
+            this.#notifyProgress("get image file from remote");  //TODO
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
@@ -385,9 +391,11 @@ export class JpzBskyClient {
                     }
                 }
             }
+            this.#notifyProgress(null);  //TODO
         }
     
         const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
+        this.#notifyProgress("uploadBlob");  //TODO
         for (const item of inputs) {
             const headers = new Headers();
             headers.append('Authorization', "Bearer " + session.accessJwt);
@@ -403,12 +411,14 @@ export class JpzBskyClient {
             resp_blob.push(res_json.blob);
             // return res_json.blob;
         }
+        this.#notifyProgress(null);  //TODO
         return resp_blob;
     }
 
     async #get_ogp(url) {
         const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?' + encodeURIComponent(url): url;
         try {
+            this.#notifyProgress("get ogp info");  //TODO
             const res = await fetch(ogp_url);
             this.last_status = res.status;
             if (!res.ok) {
@@ -430,6 +440,7 @@ export class JpzBskyClient {
                     }
                 }
             }
+            this.#notifyProgress(null);  //TODO
             return ogp;
         }
         catch(err) {
@@ -485,6 +496,7 @@ export class JpzBskyClient {
         // ドメイン名を拾う
         const regex = RegExp(/\@([\w\d][\w\d\-]*[\w\d]*\.)+[\w]{2,}/, 'g');
         let e;
+        this.#notifyProgress("resolveHandle"); //fixme: 必ず通る
         while (e = regex.exec(message)) {
             const account = message.substring(e.index, e.index + e[0].length);
             // result.push(account);
@@ -513,7 +525,8 @@ export class JpzBskyClient {
                     did: json.did
                 }]
             });
-            }
+        }
+        this.#notifyProgress(null);
         return result;
     }
 

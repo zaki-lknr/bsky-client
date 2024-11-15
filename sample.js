@@ -42,7 +42,6 @@ const load_configure = () => {
 }
 
 const progress_callback = (message) => {
-    console.log("progress_callback called");
     console.log(message);
 }
 
