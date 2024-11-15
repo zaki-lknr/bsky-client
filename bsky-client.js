@@ -418,7 +418,7 @@ export class JpzBskyClient {
     async #get_ogp(url) {
         const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?' + encodeURIComponent(url): url;
         try {
-            this.#notifyProgress("get ogp info");  //TODO
+            this.#notifyProgress("get ogp info");
             const res = await fetch(ogp_url);
             this.last_status = res.status;
             if (!res.ok) {
@@ -440,7 +440,7 @@ export class JpzBskyClient {
                     }
                 }
             }
-            this.#notifyProgress(null);  //TODO
+            this.#notifyProgress(null);
             return ogp;
         }
         catch(err) {
