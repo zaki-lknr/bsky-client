@@ -84,6 +84,7 @@ const del_session = async () => {
     const configure = load_configure();
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
     bsky.setRefreshJwt(configure.refresh_jwt);
+    bsky.setProgressCallback(progress_callback);
 
     bsky.deleteSession();
     document.getElementById("refresh_jwt").value = "";

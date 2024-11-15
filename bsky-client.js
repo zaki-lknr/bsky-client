@@ -198,7 +198,7 @@ export class JpzBskyClient {
             case 200:
                 const response = await res.json();
                 // console.log(response);
-                this.#notifyProgress(null);  //TODO
+                this.#notifyProgress(null);
                 return response;
             case 400:
             case 401:
@@ -213,7 +213,7 @@ export class JpzBskyClient {
 
     async deleteSession() {
         if (this.refresh_jwt) {
-            this.#notifyProgress("deleteSession");  //TODO
+            this.#notifyProgress("deleteSession");
             console.log("delete session start");
             const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
             const headers = new Headers();
@@ -225,7 +225,7 @@ export class JpzBskyClient {
                 throw new Error(url + ' failed: ' + await res.text());
             }
             this.refresh_jwt = null;
-            this.#notifyProgress(null);  //TODO
+            this.#notifyProgress(null);
         }
     }
 
@@ -371,7 +371,7 @@ export class JpzBskyClient {
             }
         }
         else {
-            this.#notifyProgress("get image file from remote");  //TODO
+            this.#notifyProgress("get image file from remote");
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
@@ -391,11 +391,11 @@ export class JpzBskyClient {
                     }
                 }
             }
-            this.#notifyProgress(null);  //TODO
+            this.#notifyProgress(null);
         }
     
         const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
-        this.#notifyProgress("uploadBlob");  //TODO
+        this.#notifyProgress("uploadBlob");
         for (const item of inputs) {
             const headers = new Headers();
             headers.append('Authorization', "Bearer " + session.accessJwt);
@@ -411,7 +411,7 @@ export class JpzBskyClient {
             resp_blob.push(res_json.blob);
             // return res_json.blob;
         }
-        this.#notifyProgress(null);  //TODO
+        this.#notifyProgress(null);
         return resp_blob;
     }
 
