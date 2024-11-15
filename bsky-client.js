@@ -193,7 +193,7 @@ export class JpzBskyClient {
         headers.append('Authorization', "Bearer " + refresh_jwt);
         const res = await fetch(url, { method: "POST", headers: headers });
         this.last_status = res.status;
-        console.log(this.last_status);
+        // console.log(this.last_status);
         switch (this.last_status) {
             case 200:
                 const response = await res.json();
@@ -214,13 +214,13 @@ export class JpzBskyClient {
     async deleteSession() {
         if (this.refresh_jwt) {
             this.#notifyProgress("deleteSession");
-            console.log("delete session start");
+            // console.log("delete session start");
             const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
             const headers = new Headers();
             headers.append('Authorization', "Bearer " + this.refresh_jwt);
             const res = await fetch(url, { method: "POST", headers: headers });
             this.last_status = res.status;
-            console.log(this.last_status);
+            // console.log(this.last_status);
             if (!res.ok) {
                 throw new Error(url + ' failed: ' + await res.text());
             }
