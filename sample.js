@@ -41,6 +41,10 @@ const load_configure = () => {
     return configure;
 }
 
+const progress_callback = (message) => {
+    console.log(message);
+}
+
 const post = async () => {
     // console.log("start")
     const configure = load_configure();
@@ -50,6 +54,9 @@ const post = async () => {
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
     bsky.setRefreshJwt(configure.refresh_jwt);
+    bsky.setProgressCallback(progress_callback);
+    bsky.enableCorsProxyAtOgp(true);
+
     if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
     }
@@ -78,6 +85,7 @@ const del_session = async () => {
     const configure = load_configure();
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
     bsky.setRefreshJwt(configure.refresh_jwt);
+    bsky.setProgressCallback(progress_callback);
 
     bsky.deleteSession();
     document.getElementById("refresh_jwt").value = "";
