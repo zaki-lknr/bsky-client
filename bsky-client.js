@@ -6,6 +6,7 @@
 export class JpzBskyClient {
     bsky_id;
     bsky_pass;
+    bsky_pds;
 
     // last status
     last_status;
@@ -40,6 +41,7 @@ export class JpzBskyClient {
         this.bsky_pass = pass;
         this.useCorsProxyByGetImage = false;
         this.use_corsproxy_getogp = false;
+        this.bsky_pds = "bsky.social";
     }
 
     /**
@@ -163,7 +165,7 @@ export class JpzBskyClient {
     async #createSession() {
         this.#notifyProgress("createSession");
 
-        const url = "https://bsky.social/xrpc/com.atproto.server.createSession";
+        const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.server.createSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
     
@@ -187,7 +189,7 @@ export class JpzBskyClient {
 
     async #refreshSession(refresh_jwt) {
         this.#notifyProgress("refreshSession");
-        const url = "https://bsky.social/xrpc/com.atproto.server.refreshSession";
+        const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.server.refreshSession";
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', "Bearer " + refresh_jwt);
@@ -215,7 +217,7 @@ export class JpzBskyClient {
         if (this.refresh_jwt) {
             this.#notifyProgress("deleteSession");
             // console.log("delete session start");
-            const url = "https://bsky.social/xrpc/com.atproto.server.deleteSession";
+            const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.server.deleteSession";
             const headers = new Headers();
             headers.append('Authorization', "Bearer " + this.refresh_jwt);
             const res = await fetch(url, { method: "POST", headers: headers });
@@ -253,7 +255,7 @@ export class JpzBskyClient {
             }
         }
     
-        const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
+        const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.repo.createRecord";
         const headers = new Headers();
         headers.append('Authorization', "Bearer " + session.accessJwt);
         headers.append('Content-Type', 'application/json');
@@ -394,7 +396,7 @@ export class JpzBskyClient {
             this.#notifyProgress(null);
         }
     
-        const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
+        const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.repo.uploadBlob";
         this.#notifyProgress("uploadBlob");
         for (const item of inputs) {
             const headers = new Headers();
@@ -404,7 +406,7 @@ export class JpzBskyClient {
             const res = await fetch(url, { method: "POST", body: item.blob, headers: headers });
             this.last_status = res.status;
             if (!res.ok) {
-                throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
+                throw new Error('https://' + this.bsky_pds + '/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
             }
             const res_json = await res.json()
             // console.log(res_json);
@@ -500,7 +502,7 @@ export class JpzBskyClient {
         while (e = regex.exec(message)) {
             const account = message.substring(e.index, e.index + e[0].length);
             // result.push(account);
-            const url = "https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
+            const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
             const resp = await fetch(url);
             this.last_status = resp.status;
             if (resp.status === 400) {
