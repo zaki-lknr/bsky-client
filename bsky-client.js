@@ -500,19 +500,46 @@ export class JpzBskyClient {
         let e;
         this.#notifyProgress("resolveHandle"); //fixme: 必ず通る
         while (e = regex.exec(message)) {
+            let did;
             const account = message.substring(e.index, e.index + e[0].length);
             // result.push(account);
             const url = "https://" + this.bsky_pds + "/xrpc/com.atproto.identity.resolveHandle?handle=" + account.replace(/@/, '');
             const resp = await fetch(url);
             this.last_status = resp.status;
             if (resp.status === 400) {
-                // unknown user (ignore)
-                continue;
+                // 独自PDSのアカウント問い合わせはこのRESTだと失敗してしまう。
+                // その場合は https://<PDSのアカウントID>/.well-known/atproto-did にあるファイルを参照する。
+                try {
+                    const _resolve_url = 'https://' + account.replace(/@/, '') + '/.well-known/atproto-did'
+                    const _url = 'https://corsproxy.io/?' + encodeURIComponent(_resolve_url);
+                    const _resp = await fetch(_url);
+                    this.last_status = _resp.status;
+                    if (this.last_status === 200) {
+                        const _rb = await _resp.text();
+                        //todo 形式の異なるファイルがあった場合は…
+                        console.log('id: ' + _rb);
+                        if (_rb) {
+                            did = _rb;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                catch(e) {
+                    continue;
+                }
             }
             else if (!resp.ok) {
                 throw new Error(url + ': ' + await resp.text());
             }
-            const json = await resp.json();
+            else {
+                const json = await resp.json();
+                did = json.did;
+            }
             // バイトサイズの位置に変換
             const start_pos_b = new Blob([message.substring(0, e.index)]).size;
             const end_pos_b = new Blob([message.substring(0, e.index + e[0].length)]).size;
@@ -524,7 +551,7 @@ export class JpzBskyClient {
                 },
                 features: [{
                     $type: 'app.bsky.richtext.facet#mention',
-                    did: json.did
+                    did: did
                 }]
             });
         }
