@@ -35,13 +35,21 @@ export class JpzBskyClient {
      * 
      * @param {string} Bluesky_ID
      * @param {string} Bluesky_AppPassword
+     * @param {string} PDS_Server
      */
-    constructor(id, pass) {
+    constructor(id, pass, pds) {
         this.bsky_id = id;
         this.bsky_pass = pass;
         this.useCorsProxyByGetImage = false;
         this.use_corsproxy_getogp = false;
-        this.bsky_pds = "bsky.social";
+        if (pds) {
+            console.log(pds);
+            this.bsky_pds = pds;
+        }
+        else {
+            console.log('bsky.social');
+            this.bsky_pds = "bsky.social";
+        }
     }
 
     /**
