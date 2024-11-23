@@ -21,11 +21,13 @@ document.addEventListener("DOMContentLoaded", () => {
 const save_configure = () => {
     const bsky_id = document.getElementById("bsky_id").value;
     const bsky_pass = document.getElementById("bsky_pass").value;
+    const bsky_host = document.getElementById("bsky_host").value;
     const refresh_jwt = document.getElementById("refresh_jwt").value;
 
     const configuration = {
         bsky_id: bsky_id,
         bsky_pass: bsky_pass,
+        bsky_host: bsky_host,
         refresh_jwt: refresh_jwt
     }
     localStorage.setItem('bsky_configuration', JSON.stringify(configuration));
@@ -36,6 +38,7 @@ const load_configure = () => {
 
     document.getElementById("bsky_id").value = configure.bsky_id;
     document.getElementById("bsky_pass").value = configure.bsky_pass;
+    document.getElementById("bsky_host").value = configure.bsky_host || '';
     document.getElementById("refresh_jwt").value = configure.refresh_jwt;
 
     return configure;
@@ -52,7 +55,7 @@ const post = async () => {
     const local_images = document.getElementById("file").files;
     const image_urls = document.getElementById("image_urls").value;
 
-    const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
+    const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass, configure.bsky_host);
     bsky.setRefreshJwt(configure.refresh_jwt);
     bsky.setProgressCallback(progress_callback);
     bsky.enableCorsProxyAtOgp(true);
@@ -83,7 +86,7 @@ const post = async () => {
 
 const del_session = async () => {
     const configure = load_configure();
-    const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
+    const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass, configure.bsky_host);
     bsky.setRefreshJwt(configure.refresh_jwt);
     bsky.setProgressCallback(progress_callback);
 
