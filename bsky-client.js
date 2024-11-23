@@ -524,9 +524,9 @@ export class JpzBskyClient {
                     this.last_status = _resp.status;
                     if (this.last_status === 200) {
                         const _rb = await _resp.text();
-                        //todo 形式の異なるファイルがあった場合は…
-                        console.log('id: ' + _rb);
-                        if (_rb) {
+                        // console.log('id: ' + _rb);
+                        if (_rb.startsWith('did:plc:')) {
+                            // didの形式であれば使用する
                             did = _rb;
                         }
                         else {
