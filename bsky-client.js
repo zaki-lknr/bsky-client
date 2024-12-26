@@ -426,13 +426,14 @@ export class JpzBskyClient {
     }
 
     async #get_ogp(url) {
-        const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?' + encodeURIComponent(url): url;
+        const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?url=' + encodeURIComponent(url): url;
+        // console.log("ogp_url: " + ogp_url);
         try {
             this.#notifyProgress("get ogp info");
             const res = await fetch(ogp_url);
             this.last_status = res.status;
             if (!res.ok) {
-                throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
+                throw new Error('https://corsproxy.io/?url=' + encodeURIComponent(url) + ': ' + await res.text());
             }
             const t = await res.text();
             const d = new DOMParser().parseFromString(t, "text/html");
@@ -447,6 +448,8 @@ export class JpzBskyClient {
                             // console.log(child.getAttribute('property') + ': ' + child.getAttribute('content'));
                             ogp[child.getAttribute('property')] = child.getAttribute('content');
                             break;
+                        // default:
+                        //     console.log("etc: " + child.getAttribute('property') + ': ' + child.getAttribute('content'))
                     }
                 }
             }
@@ -454,7 +457,7 @@ export class JpzBskyClient {
             return ogp;
         }
         catch(err) {
-            throw new Error('get ogp failed: ' + err + "\nurl: " + 'https://corsproxy.io/?' + encodeURIComponent(url));
+            throw new Error('get ogp failed: ' + err + "\nurl: " + 'https://corsproxy.io/?url=' + encodeURIComponent(url));
         }
     }
 
