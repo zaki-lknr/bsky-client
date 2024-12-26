@@ -522,7 +522,7 @@ export class JpzBskyClient {
                 // その場合は https://<PDSのアカウントID>/.well-known/atproto-did にあるファイルを参照する。
                 try {
                     const _resolve_url = 'https://' + account.replace(/@/, '') + '/.well-known/atproto-did'
-                    const _url = 'https://corsproxy.io/?' + encodeURIComponent(_resolve_url);
+                    const _url = 'https://corsproxy.io/?url=' + encodeURIComponent(_resolve_url);
                     const _resp = await fetch(_url);
                     this.last_status = _resp.status;
                     if (this.last_status === 200) {
