@@ -385,7 +385,7 @@ export class JpzBskyClient {
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
-                    const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?' + encodeURIComponent(image_url): image_url;
+                    const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?url=' + encodeURIComponent(image_url): image_url;
                     try {
                         const res_img = await fetch(url);
                         this.last_status = res_img.status;
