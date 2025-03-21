@@ -20,6 +20,8 @@ export class JpzBskyClient {
     image_files;
     image_urls = [];
 
+    image_aspect = [];
+
     via = 'JpzBskyClient';
 
     use_corsproxy_getimage = false;
@@ -287,10 +289,15 @@ export class JpzBskyClient {
                 images: [],
             }
             for (const blob of image_blob) {
+                console.log(blob);
                 body.record.embed.images.push(
                     {
                         image: blob,
                         alt: '',
+                        // aspectRatio: {
+                        //     width: 1080,
+                        //     height: 811
+                        // }
                     }
                 )
             }
@@ -367,10 +374,26 @@ export class JpzBskyClient {
         // console.log(response);
     }
 
+    #get_image_aspect(image_blob) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(image_blob);
+            img.onload = () => {
+                console.log(img.width);
+                console.log(img.height);
+                resolve(img);
+            }
+            img.onerror = (e) => reject(e);
+        })
+    }
+
     async #post_image(session) {
         const inputs = [];
         const resp_blob = [];
         let count = 0;
+
+        // アスペクト情報のクリア
+        this.image_aspect.splice(0);
     
         if (this.image_files != null) {
             // console.log("image files");
@@ -378,6 +401,9 @@ export class JpzBskyClient {
             for (const image_file of this.image_files) {
                 if (++count > 4) { console.log("ignore more than 4 elements"); break; } // 4ファイル以上は無視
                 inputs.push({blob: image_file, type: image_file.type});
+                const r = await this.#get_image_aspect(image_file);
+                console.log(r.width);
+                console.log(r.height);
             }
         }
         else {
