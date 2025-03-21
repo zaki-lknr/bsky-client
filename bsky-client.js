@@ -20,6 +20,8 @@ export class JpzBskyClient {
     image_files;
     image_urls = [];
 
+    image_aspect = [];
+
     via = 'JpzBskyClient';
 
     use_corsproxy_getimage = false;
@@ -84,7 +86,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.6.1";
+        return "0.6.2";
     }
 
     /**
@@ -286,13 +288,20 @@ export class JpzBskyClient {
                 $type: "app.bsky.embed.images",
                 images: [],
             }
+            let index = 0;
             for (const blob of image_blob) {
+                // console.log(blob);
                 body.record.embed.images.push(
                     {
                         image: blob,
                         alt: '',
+                        aspectRatio: {
+                            width: this.image_aspect[index].width,
+                            height: this.image_aspect[index].height
+                        }
                     }
                 )
+                index++;
             }
         }
     
@@ -367,10 +376,26 @@ export class JpzBskyClient {
         // console.log(response);
     }
 
+    #get_image_aspect(image_blob) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = image_blob;
+            img.onload = () => {
+                // console.log(img.width);
+                // console.log(img.height);
+                resolve(img);
+            }
+            img.onerror = (e) => reject(e);
+        })
+    }
+
     async #post_image(session) {
         const inputs = [];
         const resp_blob = [];
         let count = 0;
+
+        // アスペクト情報のクリア
+        this.image_aspect.splice(0);
     
         if (this.image_files != null) {
             // console.log("image files");
@@ -378,6 +403,10 @@ export class JpzBskyClient {
             for (const image_file of this.image_files) {
                 if (++count > 4) { console.log("ignore more than 4 elements"); break; } // 4ファイル以上は無視
                 inputs.push({blob: image_file, type: image_file.type});
+                const r = await this.#get_image_aspect(URL.createObjectURL(image_file));
+                // console.log(r.width);
+                // console.log(r.height);
+                this.image_aspect.push({width: r.width, height: r.height});
             }
         }
         else {
@@ -395,6 +424,10 @@ export class JpzBskyClient {
                         const image = await res_img.blob();
                         const buffer = await image.arrayBuffer();
                         inputs.push({blob: new Uint8Array(buffer), type: image.type});
+                        const r = await this.#get_image_aspect(image_url);
+                        // console.log(r.width);
+                        // console.log(r.height);
+                        this.image_aspect.push({width: r.width, height: r.height});
                     }
                     catch(err) {
                         throw new Error('get image_url failed: ' + err + "\nurl: " + url);
