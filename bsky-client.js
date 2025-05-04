@@ -3,7 +3,7 @@
  * 
  * @author zaki
  */
-export class JpzBskyClient {
+class JpzBskyClient {
     bsky_id;
     bsky_pass;
     bsky_pds;
@@ -86,7 +86,7 @@ export class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.6.2";
+        return "0.6.3";
     }
 
     /**
