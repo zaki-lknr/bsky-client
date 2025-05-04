@@ -1,6 +1,11 @@
-import {JpzBskyClient} from "./bsky-client.js";
+// import {JpzBskyClient} from "./bsky-client.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    // bskyライブラリのロード
+    const element = document.createElement('script');
+    element.src = "bsky-client.js";
+    document.body.appendChild(element);
 
     document.getElementById('btn_save').addEventListener('click', ()=> {
         save_configure();
@@ -15,8 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
         del_session();
     });
 
+    // // element.srcへのscript追加と同じ処理内では機能しないため、'load'によるイベント発火で実行する
+    // console.log(JpzBskyClient.getVersion());
+
 });
 
+window.addEventListener('load', () => {
+    // get version
+    console.log(JpzBskyClient.getVersion());
+})
 
 const save_configure = () => {
     const bsky_id = document.getElementById("bsky_id").value;

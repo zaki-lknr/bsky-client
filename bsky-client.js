@@ -3,7 +3,7 @@
  * 
  * @author zaki
  */
-export class JpzBskyClient {
+class JpzBskyClient {
     bsky_id;
     bsky_pass;
     bsky_pds;
