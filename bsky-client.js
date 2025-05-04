@@ -86,7 +86,7 @@ class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.6.2";
+        return "0.6.3";
     }
 
     /**
