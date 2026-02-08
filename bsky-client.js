@@ -24,6 +24,8 @@ class JpzBskyClient {
 
     via = 'JpzBskyClient';
 
+    corsproxy_url = 'https://corsproxy.io/?url=';
+
     use_corsproxy_getimage = false;
     use_corsproxy_getogp = false;
 
@@ -52,6 +54,14 @@ class JpzBskyClient {
             console.log('bsky.social');
             this.bsky_pds = "bsky.social";
         }
+    }
+
+    /**
+     * CorsProxyのURL設定
+     * @param {string} "http://corsproxy.io/?url=" など
+     */
+    setCorsProxyUrl(corsproxy_url) {
+        this.corsproxy_url = corsproxy_url;
     }
 
     /**
@@ -86,7 +96,7 @@ class JpzBskyClient {
      * @returns バージョン番号
      */
     static getVersion() {
-        return "0.6.3";
+        return "0.6.4a";
     }
 
     /**
@@ -414,7 +424,7 @@ class JpzBskyClient {
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
-                    const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?url=' + encodeURIComponent(image_url): image_url;
+                    const url = (this.use_corsproxy_getimage)? this.corsproxy_url + encodeURIComponent(image_url): image_url;
                     try {
                         const res_img = await fetch(url);
                         this.last_status = res_img.status;
@@ -459,14 +469,14 @@ class JpzBskyClient {
     }
 
     async #get_ogp(url) {
-        const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?url=' + encodeURIComponent(url): url;
+        const ogp_url = (this.use_corsproxy_getogp)? this.corsproxy_url + encodeURIComponent(url): url;
         // console.log("ogp_url: " + ogp_url);
         try {
             this.#notifyProgress("get ogp info");
             const res = await fetch(ogp_url);
             this.last_status = res.status;
             if (!res.ok) {
-                throw new Error('https://corsproxy.io/?url=' + encodeURIComponent(url) + ': ' + await res.text());
+                throw new Error(this.corsproxy_url + encodeURIComponent(url) + ': ' + await res.text());
             }
             const t = await res.text();
             const d = new DOMParser().parseFromString(t, "text/html");
@@ -490,7 +500,7 @@ class JpzBskyClient {
             return ogp;
         }
         catch(err) {
-            throw new Error('get ogp failed: ' + err + "\nurl: " + 'https://corsproxy.io/?url=' + encodeURIComponent(url));
+            throw new Error('get ogp failed: ' + err + "\nurl: " + this.corsproxy_url + encodeURIComponent(url));
         }
     }
 
@@ -555,7 +565,7 @@ class JpzBskyClient {
                 // その場合は https://<PDSのアカウントID>/.well-known/atproto-did にあるファイルを参照する。
                 try {
                     const _resolve_url = 'https://' + account.replace(/@/, '') + '/.well-known/atproto-did'
-                    const _url = 'https://corsproxy.io/?url=' + encodeURIComponent(_resolve_url);
+                    const _url = this.corsproxy_url + encodeURIComponent(_resolve_url);
                     const _resp = await fetch(_url);
                     this.last_status = _resp.status;
                     if (this.last_status === 200) {
